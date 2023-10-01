@@ -1,0 +1,338 @@
+basePath: /
+definitions:
+  models.AccountMutationResponse:
+    properties:
+      mutasi:
+        items:
+          $ref: '#/definitions/models.MutationResponse'
+        type: array
+      nama:
+        type: string
+      no_rekening:
+        type: string
+    type: object
+  models.AccountRegisterRequest:
+    properties:
+      nama:
+        example: John Doe
+        type: string
+      nik:
+        example: 123xxxxx
+        type: string
+      no_hp:
+        example: 0812xxxxxxxx
+        type: string
+    required:
+    - nama
+    - nik
+    - no_hp
+    type: object
+  models.AccountResponse:
+    properties:
+      created_at:
+        type: string
+      id:
+        type: string
+      nama:
+        type: string
+      nik:
+        type: string
+      no_hp:
+        type: string
+      nomor_rekening:
+        type: string
+      saldo:
+        type: number
+      updated_at:
+        type: string
+    type: object
+  models.AccountSavingRequest:
+    properties:
+      nominal:
+        example: 123
+        type: number
+      nomor_rekening:
+        example: "123459"
+        type: string
+    required:
+    - nominal
+    - nomor_rekening
+    type: object
+  models.AccountWithdrawequest:
+    properties:
+      nominal:
+        example: 123
+        type: number
+      nomor_rekening:
+        example: "123459"
+        type: string
+    required:
+    - nominal
+    - nomor_rekening
+    type: object
+  models.MutationResponse:
+    properties:
+      kode_transaksi:
+        type: string
+      nominal:
+        type: number
+      waktu:
+        type: string
+    type: object
+  models.ResponseData:
+    properties:
+      data: {}
+      message:
+        example: SUCCESS/ERROR
+        type: string
+      remark:
+        example: SUCCESS/ERROR
+        type: string
+    type: object
+  models.ResponseError:
+    properties:
+      error:
+        items:
+          $ref: '#/definitions/models.ResponseData'
+        type: array
+    type: object
+host: localhost:5100
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Fiber Swagger Example API
+  version: "3.0"
+paths:
+  /daftar:
+    post:
+      consumes:
+      - application/json
+      description: Register Account
+      parameters:
+      - description: request-body
+        in: body
+        name: request-body
+        required: true
+        schema:
+          $ref: '#/definitions/models.AccountRegisterRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseData'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.AccountResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseError'
+            - properties:
+                error:
+                  $ref: '#/definitions/models.ResponseData'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseError'
+            - properties:
+                error:
+                  $ref: '#/definitions/models.ResponseData'
+              type: object
+      summary: Register Account
+      tags:
+      - Account
+  /mutasi/{no_rekening}:
+    get:
+      consumes:
+      - application/json
+      description: Get Account Mutation
+      parameters:
+      - description: no_rekening
+        in: path
+        name: no_rekening
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseData'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.AccountMutationResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseError'
+            - properties:
+                error:
+                  $ref: '#/definitions/models.ResponseData'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseError'
+            - properties:
+                error:
+                  $ref: '#/definitions/models.ResponseData'
+              type: object
+      summary: Get Account Mutation
+      tags:
+      - Mutation
+  /saldo/{no_rekening}:
+    get:
+      consumes:
+      - application/json
+      description: Check account balance
+      parameters:
+      - description: no_rekening
+        in: path
+        name: no_rekening
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseData'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.AccountResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseError'
+            - properties:
+                error:
+                  $ref: '#/definitions/models.ResponseData'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseError'
+            - properties:
+                error:
+                  $ref: '#/definitions/models.ResponseData'
+              type: object
+      summary: Check account balance
+      tags:
+      - Account
+  /tabung:
+    post:
+      consumes:
+      - application/json
+      description: Saving to increase savings balance
+      parameters:
+      - description: request-body
+        in: body
+        name: request-body
+        required: true
+        schema:
+          $ref: '#/definitions/models.AccountSavingRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseData'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.AccountResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseError'
+            - properties:
+                error:
+                  $ref: '#/definitions/models.ResponseData'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseError'
+            - properties:
+                error:
+                  $ref: '#/definitions/models.ResponseData'
+              type: object
+      summary: Saving to increase savings balance
+      tags:
+      - Account
+  /tarik:
+    post:
+      consumes:
+      - application/json
+      description: Withdraw to decrease savings balance
+      parameters:
+      - description: request-body
+        in: body
+        name: request-body
+        required: true
+        schema:
+          $ref: '#/definitions/models.AccountWithdrawequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseData'
+            - properties:
+                data:
+                  $ref: '#/definitions/models.AccountResponse'
+              type: object
+        "400":
+          description: Bad Request
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseError'
+            - properties:
+                error:
+                  $ref: '#/definitions/models.ResponseData'
+              type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            allOf:
+            - $ref: '#/definitions/models.ResponseError'
+            - properties:
+                error:
+                  $ref: '#/definitions/models.ResponseData'
+              type: object
+      summary: Withdraw to decrease savings balance
+      tags:
+      - Account
+schemes:
+- http
+swagger: "2.0"

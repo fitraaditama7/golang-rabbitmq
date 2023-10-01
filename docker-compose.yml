@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  account-service:
+    build: ./account-service/.
+    env_file:
+      - .env
+    ports:
+      - "5100:5100"
+    volumes:
+      - ./account-service:/usr/src/app
+    depends_on:
+      - mutation-service
+      - db
+    networks:
+      - account
+
+  mutation-service:
+    build: ./mutation-service/.
+    env_file:
+      - .env
+    ports:
+      - "5200:5200"
+    volumes:
+      - ./mutation-service:/usr/src/app
+    depends_on:
+      - db
+    networks:
+      - account
+
+  db:
+    image: postgres:alpine
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-db:/var/lib/postgresql/data
+    networks:
+      - account
+  
+  migrate:
+    image: migrate/migrate:v4.15.2
+    profiles: ["tools"]
+    volumes:
+      - ./db/migrations:/migrations
+    entrypoint:
+      [
+        "migrate",
+        "-path",
+        "/migrations",
+        "-database",
+        "postgres://postgres:postgres@db:5432/account_db?sslmode=disable",
+      ]
+    command: ["up"]
+    networks:
+      - account
+    depends_on:
+      - db
+    restart: on-failure
+
+  rabbit1:
+    image: "rabbitmq:3-management"
+    hostname: "rabbit1"
+    environment:
+      RABBITMQ_ERLANG_COOKIE: "SWQOKODSQALRPCLNMEQG"
+      RABBITMQ_DEFAULT_USER: "rabbitmq"
+      RABBITMQ_DEFAULT_PASS: "rabbitmq"
+      RABBITMQ_DEFAULT_VHOST: "/"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    labels:
+      NAME: "rabbitmq1"
+    networks:
+      - account
+
+volumes:
+  postgres-db:
+
+networks:
+  account:
+    driver: bridge
